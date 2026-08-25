@@ -772,9 +772,120 @@ Date: 2026-08-25.
 | `docs/operations/{runbook,troubleshooting,disaster-recovery}.md` | ✅ | `troubleshooting.md`/`disaster-recovery.md` document this block's own real incidents (PermissionError, PID-1 zombie) as genuine operational lessons |
 | `docs/governance/source-registry.md` | ✅ | real table from `data/sources/registry.yaml` (5 sources) |
 | `ADR-014` | ✅ | |
-| `CHANGELOG.md` | ⏳ next — generated from real `git log` after this sprint's commit |
+| `CHANGELOG.md` | ✅ | generated from the real `git log` (2 real commits: `46d9829` Blocks 1-3, `18f769c` Block 4 Sprints 12-14) |
 
 No new code defects found in this sprint (documentation-only, aside from
 adding `PROMPT_VERSION = "v1"` to `prompt_builder.py` in Sprint 13 so
 `model-governance.md` had something real to reference — re-verified with
 `ruff check`/`mypy` after that change, both clean).
+
+---
+
+### Sprint 15 — Final Release & Technical Review
+
+Date: 2026-08-25.
+
+#### Real defect found and fixed: the local test suite was destroying real dev data
+
+Running the "final full suite" re-run for this sprint
+(`uv run pytest tests/unit tests/integration tests/security
+tests/observability --cov=src/cka`) is what surfaced this — the same
+command that had passed cleanly in every prior block.
+
+**Symptom**: `uv run python scripts/evaluate.py` immediately afterward
+failed the gate with `recall_at_5 = 0.000` and `result_count=0` on every
+single retrieval — a stark contrast to Block 3's real `recall_at_5 = 1.0`.
+Direct inspection confirmed the real cause was not a retrieval bug:
+
+```
+$ docker exec corporate-knowledge-assistant-db-1 psql -U cka -d cka -c "SELECT count(*) FROM documents;"
+ count
+-------
+     0
+$ docker exec corporate-knowledge-assistant-db-1 psql -U cka -d cka -c "SELECT count(*) FROM users;"
+ count
+-------
+     0
+```
+The real 5-document sample corpus and every real seeded user (including
+this block's `smoke.block4`, verified working via a real `/retrieve` call
+earlier in this same block) were gone.
+
+**Root cause**: `tests/conftest.py`'s `db_session` fixture unconditionally
+runs `DELETE FROM document_chunks`, `DELETE FROM documents`,
+`DELETE FROM users` in its teardown, after every test that uses it — by
+design, for test isolation. In CI this is safe (a fresh, throwaway
+Postgres service container every run). **Locally it is not**: local test
+runs read `DATABASE_URL` from the same `.env` used for manual dev/demo
+work (`postgresql+psycopg://cka:cka@localhost:5434/cka`), so running the
+test suite locally silently wiped the same database real `curl` sessions,
+`seed_users.py`, and every prior block's live validation had been using.
+This is exactly the class of defect this whole exercise exists to catch —
+a real, high-severity gap between "tests pass" and "the system is safe to
+operate."
+
+**Fix** (root cause, not a workaround): tests now always run against a
+dedicated `cka_test` database, never the real one, regardless of what a
+developer has `DATABASE_URL` set to locally:
+
+- `tests/conftest.py`: new `_test_database_url()` helper redirects the
+  `engine` fixture to a `..._test`-suffixed database derived from
+  `Settings.database_url`.
+- `docker/postgres/init.sql`: creates `cka_test` (with `pgvector` enabled)
+  alongside the real `cka` database on first container init, so this is
+  automatic for anyone running the stack fresh — no manual step to
+  remember.
+- `.github/workflows/ci.yml`: the ephemeral CI Postgres service is now
+  named `cka_test` directly (was `cka`) — the redirect above is then a
+  no-op there, avoiding a CI-only special case, while keeping the safety
+  net active in the one place it was actually needed (a developer's own
+  machine, where the database is long-lived and shared with real data).
+
+**Verified for real**: created `cka_test` on the already-running local
+container, ran `alembic upgrade head` against it, re-ran the full suite —
+`231 passed, 4 skipped`, same 95% coverage as before the fix. Then
+confirmed directly that the real `cka` database was untouched:
+```
+$ docker exec corporate-knowledge-assistant-db-1 psql -U cka -d cka -c "SELECT count(*) FROM documents;"
+ count
+-------
+     5
+$ docker exec corporate-knowledge-assistant-db-1 psql -U cka -d cka -c "SELECT count(*) FROM users;"
+ count
+-------
+     5
+```
+(5 documents/5 users because the real corpus and a re-ingestion user had
+to be restored first — see below — this second run is the real proof the
+fix holds under an actual full test-suite pass, not just reasoning about
+the code.)
+
+#### An honestly-unresolved anomaly, noted rather than papered over
+
+Between discovering the wipe and applying the fix, this machine's Docker
+Desktop required a **second** full Windows restart this block (unrelated
+trigger this time — general host instability rather than another zombie
+container; the previous SBOM-attempt zombie, `suspicious_gagarin`, was
+gone after this restart, confirming the restart did clear it). After that
+restart, `documents` was still `0` as expected, but `users` unexpectedly
+showed `4` real rows — the exact four real usernames from before the
+wipe (`employee.test`, `manager.test`, `admin.test`, `smoke.block4`), not
+zero as directly verified pre-restart. The most plausible explanation is
+Postgres crash-recovery replaying WAL only up to the last durably-flushed
+checkpoint before the ungraceful VM shutdown, landing between the
+`documents`/`document_chunks` deletes and the `users` delete of what was,
+per the fixture, a single committed transaction — but this was not
+forensically confirmed, and is stated here as an observed anomaly on this
+specific host, not a verified root cause. It does not change the real fix
+above, which addresses the actual defect (tests targeting the wrong
+database) regardless of this side detail.
+
+#### Real data restoration
+
+Re-seeded via a one-off script reusing `scripts/seed_users.py`'s own
+repository/hashing code (`reingest.block4`, ADMIN role, real random
+password, never persisted) and real `POST /documents` calls for all 5
+files in `data/raw/samples/` against their real `source_id`s from
+`data/sources/registry.yaml` — all five returned `201`, chunk counts
+matching Block 2/3's original ingestion shape (1 chunk each for the four
+`.txt` samples, 2 for the PDF).

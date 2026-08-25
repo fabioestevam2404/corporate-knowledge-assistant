@@ -1,0 +1,74 @@
+{
+  "app_version": "1.0.0",
+  "generated_at": "2026-08-25T19:50:00Z",
+  "git_commit": "18f769c8830418903d5068062b890a6d14b0eb1e",
+  "models": {
+    "generation_llm": "claude-sonnet-5",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_dimension": 384,
+    "reranker_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "llm_judge_model": "claude-sonnet-5",
+    "prompt_version": "v1"
+  },
+  "evaluation": {
+    "source": "reports/evaluation_latest.json",
+    "generated_at": "2026-08-25T19:42:44.291088+00:00",
+    "dataset": "golden-v1-block3",
+    "real_llm_used": false,
+    "retrieval": {
+      "recall_at_5": 1.0,
+      "precision_at_5": 0.2,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "case_count": 8
+    },
+    "generation": {
+      "citation_accuracy": 0.0,
+      "citation_completeness": 0.5,
+      "abstention_accuracy": 0.5,
+      "case_count": 6,
+      "faithfulness": null,
+      "answer_relevance": null,
+      "judged_case_count": 0
+    },
+    "adversarial": {
+      "resistance_rate": 1.0,
+      "abstention_accuracy": 1.0,
+      "case_count": 4,
+      "failures": []
+    },
+    "gate_result": "passed",
+    "known_gap": "never run against a real ANTHROPIC_API_KEY -- generation-quality metrics (citation_accuracy/faithfulness/answer_relevance) are real-code-path-tested but not real-model-validated"
+  },
+  "performance_baseline": {
+    "measured_at": "2026-08-25",
+    "sample_size_per_endpoint": 25,
+    "retrieve_ms": { "p50": 191.9, "p95": 334.4, "p99": 5850.0, "min": 175.9, "max": 7585.3, "mean": 496.9 },
+    "ask_ms": { "p50": 204.4, "p95": 314.3, "p99": 355.8, "min": 185.6, "max": 363.1, "mean": 218.7 },
+    "note": "ask_ms reflects the FakeLLMProvider fallback path (no ANTHROPIC_API_KEY configured in this environment), not a real generation call -- see model.generation_llm and evaluation.known_gap. retrieve_ms p99/max is a single real outlier (7585ms against a 175-334ms baseline), not re-run to smooth it out -- see docs/release-gate/PROGRESS.md, Sprint 15, for the honest read on why."
+  },
+  "test_suite": {
+    "unit_integration_security_observability": { "passed": 231, "skipped": 4, "coverage_pct": 95 },
+    "lint": "ruff check . -- all checks passed",
+    "format": "ruff format --check . -- all files formatted",
+    "type_check": "mypy src tests scripts -- no issues found"
+  },
+  "security_scans": {
+    "pip_audit": "0 known vulnerabilities",
+    "semgrep": "290 rules, 89 files, 0 findings",
+    "gitleaks": "0 leaks (1 historical finding reviewed and fixed at the root, accepted via baseline)"
+  },
+  "container": {
+    "base_image": "python:3.12-slim",
+    "build": "multi-stage",
+    "runtime_user": "app (uid 999, non-root)",
+    "init_process": "tini (docker-compose.yml init: true)"
+  },
+  "known_gaps": [
+    "No GitHub Actions runner execution verification (no act, no GitHub remote)",
+    "No cloud deployment (Terraform scaffolding written, never applied -- ADR-013)",
+    "No local SBOM generation (Syft runs correctly in CI; 3 local attempts on this machine did not reliably complete -- ADR-012)",
+    "No GET /audit endpoint (structured log events only -- ADR-009/ADR-012)",
+    "Generation-quality evaluation metrics never validated against a real Anthropic key"
+  ]
+}

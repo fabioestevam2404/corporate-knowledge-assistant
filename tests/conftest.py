@@ -1,3 +1,4 @@
+import os
 import uuid
 from collections.abc import Callable, Generator
 
@@ -16,6 +17,22 @@ from cka.infrastructure.security.jwt import create_access_token
 
 # Shared across tests/integration, tests/security and tests/observability —
 # fixtures live at this top level so all three can use them.
+
+
+def pytest_configure() -> None:
+    """Forces every Settings() constructed for the rest of this process —
+    our own fixtures below AND the real app under test (TestClient(app)
+    builds its own engine from get_settings().database_url) — onto a
+    dedicated test database, never the one real dev/demo data lives in.
+    db_session below unconditionally deletes every row in documents/
+    document_chunks/users after each test; running that against the plain
+    DATABASE_URL once destroyed the real seeded dev corpus and users (see
+    docs/release-gate/PROGRESS.md, Block 4/Sprint 15). Runs before test
+    collection/import, so it's set before any code can call get_settings().
+    setdefault (not direct assignment) means CI's own DATABASE_URL (already
+    cka_test, see .github/workflows/ci.yml) is respected unchanged.
+    """
+    os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://cka:cka@localhost:5434/cka_test")
 
 
 @pytest.fixture(scope="session")

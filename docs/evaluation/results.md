@@ -1,10 +1,11 @@
 # Evaluation Results
 
 Real output of `uv run python scripts/evaluate.py`, from
-`reports/evaluation_latest.json` (generated 2026-08-25T02:17:21Z, Block 3).
-See `evaluation.md` for methodology. Re-run as part of Sprint 15's final
-full-suite pass before the v1.0.0 tag — this document reflects the most
-recent real run at time of writing, not a synthetic example.
+`reports/evaluation_latest.json`, re-run as part of Sprint 15's final
+full-suite pass (`generated_at: 2026-08-25T19:42:44Z`) — the same
+methodology and numbers as Block 3's original run, reproduced against the
+real sample corpus after it was restored following the real data-loss
+defect documented in `docs/release-gate/PROGRESS.md` (Sprint 15).
 
 ```json
 {

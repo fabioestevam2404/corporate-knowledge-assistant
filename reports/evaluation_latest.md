@@ -1,6 +1,6 @@
 # RAG Evaluation Report
 
-Generated: 2026-08-25T02:17:21.877875+00:00
+Generated: 2026-08-25T19:42:44.291088+00:00
 Real LLM used: False
 
 ## Retrieval

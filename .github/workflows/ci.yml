@@ -15,16 +15,20 @@ jobs:
         env:
           POSTGRES_USER: cka
           POSTGRES_PASSWORD: cka
-          POSTGRES_DB: cka
+          # Named cka_test (not cka) so tests/conftest.py's database-name
+          # redirect (see _test_database_url) is a no-op here — this whole
+          # database is thrown away after the job either way, but staying
+          # consistent avoids a CI-only special case.
+          POSTGRES_DB: cka_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U cka -d cka"
+          --health-cmd "pg_isready -U cka -d cka_test"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql+psycopg://cka:cka@localhost:5432/cka
+      DATABASE_URL: postgresql+psycopg://cka:cka@localhost:5432/cka_test
       ENVIRONMENT: test
       OTEL_TRACES_ENABLED: "false"
 
@@ -54,7 +58,7 @@ jobs:
       - name: Enable pgvector extension
         run: |
           docker exec $(docker ps -q --filter "ancestor=pgvector/pgvector:pg16") \
-            psql -U cka -d cka -c "CREATE EXTENSION IF NOT EXISTS vector;"
+            psql -U cka -d cka_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
       - name: Run migrations
         run: uv run alembic upgrade head
