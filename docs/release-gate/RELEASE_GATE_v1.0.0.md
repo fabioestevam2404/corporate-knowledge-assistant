@@ -6,10 +6,8 @@ across Blocks 1–4, cross-referenced to `PROGRESS.md` (the full command-by-
 command log) rather than duplicating it. Every ✅/⚠️/❌ below reflects a
 real, executed check — not a conceptual mark.
 
-**App version**: `1.0.0` · **Git commit**: `18f769c8830418903d5068062b890a6d14b0eb1e`
-(plus this sprint's uncommitted-at-time-of-writing fixes — see the real
-commit this document itself ships in) · **Manifest**:
-`docs/release-gate/ai-release-manifest.json`
+**App version**: `1.0.0` · **Git commit**: `0f63cb82d4f9f03a1c78229563fd2cf8b8314110`
+· **Manifest**: `docs/release-gate/ai-release-manifest.json`
 
 ---
 

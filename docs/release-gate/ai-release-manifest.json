@@ -1,7 +1,7 @@
 {
   "app_version": "1.0.0",
   "generated_at": "2026-08-25T19:50:00Z",
-  "git_commit": "18f769c8830418903d5068062b890a6d14b0eb1e",
+  "git_commit": "0f63cb82d4f9f03a1c78229563fd2cf8b8314110",
   "models": {
     "generation_llm": "claude-sonnet-5",
     "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
