@@ -1,0 +1,33 @@
+# Generation evaluation cases — factoid questions the corpus answers, and
+# no-answer questions the corpus has no evidence for (must abstain, not
+# hallucinate). Run through the real AskKnowledgeBase orchestrator.
+cases:
+  - id: g001
+    query: "How many days per week can I work remotely?"
+    expected_sources: [SRC-SAMPLE-001]
+    expected_behavior: answer
+
+  - id: g002
+    query: "What are the password length requirements?"
+    expected_sources: [SRC-SAMPLE-002]
+    expected_behavior: answer
+
+  - id: g003
+    query: "What is the deadline to submit an expense reimbursement request?"
+    expected_sources: [SRC-SAMPLE-004]
+    expected_behavior: answer
+
+  - id: g004
+    query: "What was the company's total revenue in 1999?"
+    expected_sources: []
+    expected_behavior: abstain
+
+  - id: g005
+    query: "What is the exact dollar salary of the CEO?"
+    expected_sources: []
+    expected_behavior: abstain
+
+  - id: g006
+    query: "What color is used in the company's office walls?"
+    expected_sources: []
+    expected_behavior: abstain

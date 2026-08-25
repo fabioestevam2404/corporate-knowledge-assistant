@@ -1,0 +1,22 @@
+Corporate Knowledge Assistant — Sample Document
+Title: Remote Work Policy (Sample)
+Classification: public
+License: CC0-1.0 (authored as sample/placeholder content for this project)
+Version: 1.0
+
+1. Purpose
+This sample policy describes baseline rules for remote work eligibility, used only
+as placeholder content to exercise the ingestion and retrieval pipeline during
+development. It is not a real corporate policy.
+
+2. Eligibility
+Employees in good standing may work remotely up to three days per week, subject to
+manager approval and role requirements.
+
+3. Equipment
+The company provides a laptop and VPN access. Personal devices must comply with the
+security baseline described in the companion Information Security Policy sample.
+
+4. Working Hours
+Remote employees are expected to be reachable during core hours, defined locally by
+each team, and must attend scheduled synchronous meetings.

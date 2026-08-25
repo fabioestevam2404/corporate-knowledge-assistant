@@ -1,0 +1,21 @@
+Corporate Knowledge Assistant — Sample Document
+Title: Information Security Policy (Sample)
+Classification: internal
+License: CC0-1.0 (authored as sample/placeholder content for this project)
+Version: 1.0
+
+1. Purpose
+This sample policy is placeholder content used to exercise the ingestion, retrieval
+and access-control pipeline during development. It is not a real corporate policy.
+
+2. Password Requirements
+Accounts must use unique passwords of at least twelve characters, stored only as
+salted hashes, never in plain text or logs.
+
+3. Access Control
+Access to systems and documents follows least-privilege and role-based access
+control. Confidential material additionally requires an explicit access grant.
+
+4. Incident Reporting
+Suspected security incidents must be reported to the security team immediately
+through the designated incident channel.

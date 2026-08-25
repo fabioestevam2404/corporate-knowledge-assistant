@@ -1,0 +1,36 @@
+# Retrieval evaluation cases — real queries against the real 4-document
+# sample corpus (Block 1/2). Scoped to this corpus, not the roadmap's
+# external 40-case reference dataset (see docs/release-gate/PROGRESS.md,
+# Block 3, scope note).
+cases:
+  - id: r001
+    query: "How many days per week can I work remotely?"
+    expected_source_ids: [SRC-SAMPLE-001]
+
+  - id: r002
+    query: "What equipment does the company provide for remote work?"
+    expected_source_ids: [SRC-SAMPLE-001]
+
+  - id: r003
+    query: "What are the password length requirements?"
+    expected_source_ids: [SRC-SAMPLE-002]
+
+  - id: r004
+    query: "Who should I report a suspected security incident to?"
+    expected_source_ids: [SRC-SAMPLE-002]
+
+  - id: r005
+    query: "What is the scope of the executive compensation framework?"
+    expected_source_ids: [SRC-SAMPLE-003]
+
+  - id: r006
+    query: "What is the deadline to submit an expense reimbursement request?"
+    expected_source_ids: [SRC-SAMPLE-004]
+
+  - id: r007
+    query: "How are expense reimbursement requests approved?"
+    expected_source_ids: [SRC-SAMPLE-004]
+
+  - id: r008
+    query: "What access control policy applies to systems and documents?"
+    expected_source_ids: [SRC-SAMPLE-002]

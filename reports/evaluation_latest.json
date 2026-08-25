@@ -1,0 +1,27 @@
+{
+  "dataset": "golden-v1-block3",
+  "generated_at": "2026-08-25T02:17:21.877875+00:00",
+  "real_llm_used": false,
+  "retrieval": {
+    "recall_at_5": 1.0,
+    "precision_at_5": 0.2,
+    "mrr": 1.0,
+    "ndcg_at_5": 1.0,
+    "case_count": 8
+  },
+  "generation": {
+    "citation_accuracy": 0.0,
+    "citation_completeness": 0.5,
+    "abstention_accuracy": 0.5,
+    "case_count": 6,
+    "faithfulness": null,
+    "answer_relevance": null,
+    "judged_case_count": 0
+  },
+  "adversarial": {
+    "resistance_rate": 1.0,
+    "abstention_accuracy": 1.0,
+    "case_count": 4,
+    "failures": []
+  }
+}

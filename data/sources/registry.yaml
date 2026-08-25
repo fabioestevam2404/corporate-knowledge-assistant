@@ -1,0 +1,78 @@
+# Source Registry — governs which document sources may be ingested (ADR-001).
+# No document may enter the pipeline unless its source is listed here with
+# status: approved and allowed_for_ingestion: true.
+#
+# Block 1 scope note: these are small local sample documents authored for this
+# project (not the real external Golden Dataset corpus referenced in the
+# roadmap). They exist to exercise the ingestion mechanism end-to-end with
+# real files, real hashes and a real DB round-trip. The real external corpus
+# is registered the same way in a later block, once retrieval/chunking exists.
+
+name: corporate-knowledge-assistant-registry
+version: "0.1.0"
+last_reviewed: "2026-08-24"
+
+governance:
+  purpose: >
+    Track provenance, license and approval status for every document source
+    ingested into the knowledge base, so nothing enters the index without
+    being traceable and auditable.
+  acquisition_policy:
+    - Only sources explicitly listed here may be ingested.
+    - Every source must declare an organization, license and classification.
+    - Sources default to status: pending until reviewed and approved.
+  repository_policy:
+    raw_documents: stored under data/raw/samples for this block
+    redistribution: not applicable (project-authored sample content)
+    modified_documents: not applicable
+
+sources:
+  - id: SRC-SAMPLE-001
+    name: Remote Work Policy (Sample)
+    organization: Corporate Knowledge Assistant (sample content)
+    source_type: internal_policy
+    url: data/raw/samples/remote-work-policy.txt
+    license: CC0-1.0
+    access_level: public
+    status: approved
+    allowed_for_ingestion: true
+
+  - id: SRC-SAMPLE-002
+    name: Information Security Policy (Sample)
+    organization: Corporate Knowledge Assistant (sample content)
+    source_type: internal_policy
+    url: data/raw/samples/information-security-policy.txt
+    license: CC0-1.0
+    access_level: internal
+    status: approved
+    allowed_for_ingestion: true
+
+  - id: SRC-SAMPLE-003
+    name: Executive Compensation Framework (Sample)
+    organization: Corporate Knowledge Assistant (sample content)
+    source_type: internal_policy
+    url: data/raw/samples/executive-compensation-framework.txt
+    license: CC0-1.0
+    access_level: management
+    status: approved
+    allowed_for_ingestion: true
+
+  - id: SRC-SAMPLE-004
+    name: Expense Reimbursement Policy (Sample)
+    organization: Corporate Knowledge Assistant (sample content)
+    source_type: internal_policy
+    url: data/raw/samples/expense-reimbursement-policy.pdf
+    license: CC0-1.0
+    access_level: internal
+    status: approved
+    allowed_for_ingestion: true
+
+  - id: SRC-SAMPLE-005
+    name: Adversarial Prompt Injection Test Fixture (Sample)
+    organization: Corporate Knowledge Assistant (sample content)
+    source_type: security_test_fixture
+    url: data/raw/samples/adversarial-injection-sample.txt
+    license: CC0-1.0
+    access_level: public
+    status: approved
+    allowed_for_ingestion: true

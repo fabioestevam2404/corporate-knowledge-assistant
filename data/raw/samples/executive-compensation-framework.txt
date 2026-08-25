@@ -1,0 +1,19 @@
+Corporate Knowledge Assistant — Sample Document
+Title: Executive Compensation Framework (Sample)
+Classification: management
+License: CC0-1.0 (authored as sample/placeholder content for this project)
+Version: 1.0
+
+1. Purpose
+This sample document is placeholder content, classified as management-restricted,
+used to exercise document-ACL and authorization tests later in the roadmap (the
+EMPLOYEE-vs-MANAGEMENT retrieval test from Sprint 15). It is not real compensation
+data.
+
+2. Scope
+Applies only to management-level review of compensation bands and is not intended
+for general employee access.
+
+3. Note
+This content should never be returned by retrieval to a user without management-
+level authorization once document ACL enforcement is implemented.

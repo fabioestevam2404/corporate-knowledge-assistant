@@ -1,0 +1,65 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: cka
+      POSTGRES_PASSWORD: cka
+      POSTGRES_DB: cka
+    ports:
+      - "5434:5432"
+    volumes:
+      - cka_pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cka -d cka"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.60
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686" # UI
+      - "4317:4317" # OTLP gRPC receiver
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://cka:cka@db:5432/cka
+      ENVIRONMENT: development
+      LOG_LEVEL: INFO
+      OTEL_TRACES_ENABLED: "true"
+      OTLP_ENDPOINT: jaeger:4317
+    ports:
+      - "8010:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      jaeger:
+        condition: service_started
+
+volumes:
+  cka_pgdata:
