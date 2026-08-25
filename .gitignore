@@ -13,6 +13,8 @@ wheels/
 .env
 .env.*
 !.env.example
+!.env.staging.example
+!.env.production.example
 
 # Tooling / coverage
 .pytest_cache/
@@ -21,4 +23,11 @@ wheels/
 .coverage
 htmlcov/
 *.log
+
+# Terraform (infra/) — real state/vars files, never the .example templates
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
 

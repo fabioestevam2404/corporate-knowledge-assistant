@@ -38,6 +38,11 @@ services:
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      # Anonymous viewer access above covers the dashboard; this only gates
+      # admin-level actions. Never left on Grafana's well-known "admin"
+      # default — override via GRAFANA_ADMIN_PASSWORD in .env for anything
+      # beyond throwaway local dev.
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-local-dev-only-change-me}
     ports:
       - "3000:3000"
     volumes:
@@ -47,6 +52,12 @@ services:
 
   api:
     build: .
+    # A native subprocess spawned during a HF model download (hf_xet) can be
+    # orphaned by a network blip; without an init process as PID 1 to reap
+    # it, the orphan goes zombie and the whole container becomes unkillable
+    # (docker kill/rm both hang). init: true runs tini as PID 1 instead of
+    # uvicorn directly, so orphans always get reaped. See ADR-012.
+    init: true
     environment:
       DATABASE_URL: postgresql+psycopg://cka:cka@db:5432/cka
       ENVIRONMENT: development

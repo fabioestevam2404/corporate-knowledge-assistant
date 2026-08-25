@@ -1,3 +1,7 @@
+# Bumped whenever SYSTEM_PROMPT's instructions change in a way that could
+# shift model behavior — tracked in docs/governance/model-governance.md.
+PROMPT_VERSION = "v1"
+
 SYSTEM_PROMPT = """Você é o Corporate Knowledge Assistant.
 
 Responda exclusivamente utilizando as evidências fornecidas no bloco UNTRUSTED_DOCUMENTS.

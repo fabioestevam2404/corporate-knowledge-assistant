@@ -1,0 +1,9 @@
+# Copy to terraform.tfvars and fill in real values. Never commit the filled
+# copy — terraform.tfvars is (and must stay) in .gitignore. Prefer passing
+# secrets via -var / TF_VAR_* from a real secret manager over a tfvars file
+# at all, in CI.
+
+container_image   = "ghcr.io/REPLACE_ME_ORG/corporate-knowledge-assistant:v1.0.0-rc.1"
+db_password       = "REPLACE_ME"
+jwt_secret_key    = "REPLACE_ME_AT_LEAST_32_BYTES"
+anthropic_api_key = "REPLACE_ME"
