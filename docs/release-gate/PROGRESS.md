@@ -517,10 +517,11 @@ not silently claimed as tested.
 
 ### Real defects caught and fixed during this sprint
 
-1. **Secret in a documented command example.** `gitleaks` flagged
-   `curl -u admin:admin ...` in this very file's Grafana example (a real,
-   working default at the time). Fixed at the root, not just in the
-   doc: hardened `GF_SECURITY_ADMIN_PASSWORD` in `docker-compose.yml` to
+1. **Secret in a documented command example.** `gitleaks` flagged a
+   `curl` example using Grafana's well-known default admin credentials in
+   this very file (a real, working default at the time). Fixed at the
+   root, not just in the doc: hardened `GF_SECURITY_ADMIN_PASSWORD` in
+   `docker-compose.yml` to
    `${GRAFANA_ADMIN_PASSWORD:-local-dev-only-change-me}` (verified anonymous
    Viewer access already covers dashboard reads without auth), added
    `GRAFANA_ADMIN_PASSWORD=` to `.env.example`, and dropped `-u admin:admin`
