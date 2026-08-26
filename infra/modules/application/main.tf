@@ -168,8 +168,8 @@ resource "aws_iam_role_policy" "execution_ssm" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = ["ssm:GetParameters"]
+      Effect = "Allow"
+      Action = ["ssm:GetParameters"]
       Resource = [
         aws_ssm_parameter.database_url.arn,
         aws_ssm_parameter.jwt_secret_key.arn,
@@ -196,12 +196,18 @@ resource "aws_iam_role" "task" {
   })
 }
 
+# internal = false is intentional: this is the public API entry point for
+# the assistant, not an internal-only service — see aws_lb_listener.https
+# below for the HTTPS-only, TLS 1.3 access path. AVD-AWS-0053 flags this
+# as a warning to catch *accidental* exposure; here it's the whole point.
+# trivy:ignore:AVD-AWS-0053
 resource "aws_lb" "this" {
-  name               = "cka-${var.environment}"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [var.alb_security_group_id]
-  subnets            = var.public_subnet_ids
+  name                       = "cka-${var.environment}"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [var.alb_security_group_id]
+  subnets                    = var.public_subnet_ids
+  drop_invalid_header_fields = true
 }
 
 resource "aws_lb_target_group" "app" {
