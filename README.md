@@ -1,95 +1,99 @@
 # Corporate Knowledge Assistant
 
-An enterprise RAG (Retrieval-Augmented Generation) system: authenticated,
-role- and document-ACL-aware question answering over a governed corporate
-document corpus, with citations, abstention on insufficient evidence, and
-full observability/auditability.
+Um sistema RAG (Retrieval-Augmented Generation) corporativo: perguntas e
+respostas autenticadas, com controle de acesso por papel e por documento,
+sobre uma base documental governada — com citações, abstenção quando não
+há evidência suficiente, e observabilidade/auditabilidade completas.
 
-**Status: `v1.0.0`.** Built incrementally across four blocks, each closed
-out with real command output, not aspirational checkmarks — the full,
-block-by-block evidence log lives in
-[`docs/release-gate/PROGRESS.md`](docs/release-gate/PROGRESS.md), and the
-consolidated release decision is in
+**Status: `v1.0.0`.** Construído incrementalmente em quatro blocos, cada
+um fechado com evidência real de comando executado, não checkmarks
+aspiracionais — o log completo de evidências, bloco a bloco, está em
+[`docs/release-gate/PROGRESS.md`](docs/release-gate/PROGRESS.md), e a
+decisão de release consolidada está em
 [`docs/release-gate/RELEASE_GATE_v1.0.0.md`](docs/release-gate/RELEASE_GATE_v1.0.0.md).
 
-That release gate document is deliberately honest, including where it
-isn't clean: one real evaluation-quality check
-(`citation_accuracy`) currently fails against the golden dataset, for a
-specific, understood, documented reason — and that failure was left in
-place rather than resolved by loosening a threshold, because doing so
-would have quietly weakened the system's real hallucination-prevention
-guarantee. Several other real defects were found and fixed the same way,
-at every stage of the project, right up through configuring a real
-`ANTHROPIC_API_KEY` for the first time post-tag. That trail is the point:
-every claim in this repository is backed by something that was actually
-run, not just written down.
+Esse documento de release gate é deliberadamente honesto, inclusive onde
+não está tudo limpo: uma verificação real de qualidade de avaliação
+(`citation_accuracy`) falha atualmente contra o golden dataset, por um
+motivo específico, entendido e documentado — e essa falha foi mantida em
+vez de resolvida afrouxando um limiar, porque isso teria enfraquecido
+silenciosamente a garantia real do sistema contra alucinação. Vários
+outros defeitos reais foram encontrados e corrigidos da mesma forma, em
+cada etapa do projeto, até a configuração de uma `ANTHROPIC_API_KEY` real
+pela primeira vez, já depois da tag de release. Esse rastro é o ponto
+central: toda afirmação neste repositório é sustentada por algo que
+realmente foi executado, não apenas escrito.
 
-## What's implemented
+## O que está implementado
 
-- FastAPI + PostgreSQL/pgvector, structured observability (structlog with
-  request correlation), a governed Source Registry gating document
-  ingestion.
-- Chunking + real sentence-transformer embeddings, hybrid retrieval
-  (pgvector cosine + PostgreSQL full-text search, RRF-fused) with
-  cross-encoder reranking.
-- A grounded RAG orchestrator (`POST /ask`) with citation validation,
-  rule-based confidence, and abstention on insufficient evidence — real
-  generation via Anthropic Claude behind an abstract `LLMProvider`
-  (`FakeLLMProvider` fallback when no key is configured).
-- JWT authentication + Argon2id password hashing, RBAC + real per-role
-  document ACL (the roadmap's flagship EMPLOYEE-vs-MANAGEMENT
-  authorization test is real and passing), per-user rate limiting.
-- A RAG evaluation framework with a real Golden Dataset
-  (`scripts/evaluate.py`) and real LLM-as-judge scoring.
-- Real distributed tracing (OpenTelemetry → Jaeger) and metrics
-  (Prometheus → Grafana, both file-provisioned, not clicked together).
-- Multi-stage, non-root Docker build; 4 GitHub Actions workflows
-  (CI, security scanning, container build/scan, tag-triggered release);
-  AWS Terraform scaffolding for staging/production (`infra/`).
-- A full documentation set — architecture, API reference, security
-  controls, evaluation methodology, operations runbook — in
-  [`docs/`](docs/), and 15 real ADRs in [`docs/adr/`](docs/adr/).
+- FastAPI + PostgreSQL/pgvector, observabilidade estruturada (structlog
+  com correlação de requisições), um Registro de Fontes governado que
+  controla a ingestão de documentos.
+- Chunking + embeddings reais via sentence-transformers, retrieval híbrido
+  (cosseno via pgvector + busca full-text no PostgreSQL, fundidos via RRF)
+  com reranking por cross-encoder.
+- Um orquestrador RAG com resposta fundamentada (`POST /ask`), validação
+  de citações, confiança baseada em regras e abstenção quando a evidência
+  é insuficiente — geração real via Anthropic Claude atrás de uma
+  interface abstrata `LLMProvider` (fallback `FakeLLMProvider` quando
+  nenhuma chave está configurada).
+- Autenticação JWT + hashing de senha com Argon2id, RBAC + controle de
+  acesso real por papel e por documento (o teste de autorização
+  EMPLOYEE-vs-MANAGEMENT do roadmap é real e está passando), rate
+  limiting por usuário.
+- Um framework de avaliação RAG com um Golden Dataset real
+  (`scripts/evaluate.py`) e pontuação real via LLM-as-judge.
+- Tracing distribuído real (OpenTelemetry → Jaeger) e métricas
+  (Prometheus → Grafana, ambos provisionados via arquivo, não configurados
+  manualmente).
+- Build Docker multi-stage, não-root; 4 workflows do GitHub Actions (CI,
+  varredura de segurança, build/scan de container, release por tag);
+  scaffolding Terraform para AWS em staging/produção (`infra/`).
+- Um conjunto completo de documentação — arquitetura, referência de API,
+  controles de segurança, metodologia de avaliação, runbook de operações —
+  em [`docs/`](docs/), e 15 ADRs reais em [`docs/adr/`](docs/adr/).
 
-## Quick start
+## Como rodar
 
 ```bash
-# 1. Install dependencies (uv manages its own Python 3.12)
+# 1. Instalar dependências (uv gerencia sua própria instalação do Python 3.12)
 pip install uv
 uv python install 3.12
 uv sync
 
-# 2. Start PostgreSQL + pgvector
+# 2. Subir PostgreSQL + pgvector
 docker compose up -d db
 
-# 3. Apply migrations
+# 3. Aplicar as migrations
 cp .env.example .env
 uv run alembic upgrade head
 
-# (optional) add a real ANTHROPIC_API_KEY to .env for real /ask generation —
-# without it, /ask still works (retrieval, ACL, abstention), using
-# FakeLLMProvider instead of a real model call.
+# (opcional) adicione uma ANTHROPIC_API_KEY real no .env para geração real em /ask —
+# sem ela, /ask continua funcionando (retrieval, ACL, abstenção), usando
+# FakeLLMProvider em vez de uma chamada real ao modelo.
 
-# 4. Seed a user (see scripts/seed_users.py) and log in
+# 4. Criar um usuário (veja scripts/seed_users.py) e fazer login
 uv run python scripts/seed_users.py
 curl -X POST http://127.0.0.1:8000/auth/login -d '{"username": "employee.test", "password": "..."}'
 
-# 5. Run the API
+# 5. Rodar a API
 uv run uvicorn cka.main:app --reload
 
-# 6. Check it's alive, then ask something (with the token from step 4)
+# 6. Verificar que está no ar, e então perguntar algo (com o token do passo 4)
 curl http://127.0.0.1:8000/health
 curl http://127.0.0.1:8000/health/ready
 curl -X POST http://127.0.0.1:8000/ask \
-  -H "Authorization: Bearer <token>" -d '{"query": "your question here"}'
+  -H "Authorization: Bearer <token>" -d '{"query": "sua pergunta aqui"}'
 ```
 
-> Running the full stack via `docker compose up` instead of `uvicorn`
-> directly? The API is published on host port `8010` (not 8000), Postgres on
-> `5434` (not 5432), Jaeger UI on `16686`, Prometheus on `9090`, Grafana on
-> `3000` — see the port note in `docs/release-gate/PROGRESS.md` for why the
-> app ports are non-default.
+> Rodando a stack completa via `docker compose up` em vez de `uvicorn`
+> diretamente? A API é publicada na porta `8010` do host (não 8000), o
+> Postgres na `5434` (não 5432), a UI do Jaeger na `16686`, o Prometheus na
+> `9090`, o Grafana na `3000` — veja a nota sobre portas em
+> `docs/release-gate/PROGRESS.md` para entender por que as portas fogem do
+> padrão.
 
-## Tests
+## Testes
 
 ```bash
 uv run ruff check .
@@ -98,36 +102,39 @@ uv run mypy src tests scripts
 uv run pytest --cov=src/cka --cov-report=term-missing
 ```
 
-Unit tests (`tests/unit`) run without Docker. Integration tests
-(`tests/integration`), security tests (`tests/security`) and observability
-tests (`tests/observability`) require `docker compose up -d db` first, and
-run against a dedicated `cka_test` database (never the one real dev/demo
-data lives in — see `tests/conftest.py`).
+Os testes unitários (`tests/unit`) rodam sem Docker. Os testes de
+integração (`tests/integration`), de segurança (`tests/security`) e de
+observabilidade (`tests/observability`) exigem `docker compose up -d db`
+primeiro, e rodam contra um banco dedicado `cka_test` (nunca o banco onde
+vivem os dados reais de desenvolvimento/demo — veja `tests/conftest.py`).
 
-## Evaluation
+## Avaliação
 
 ```bash
 uv run python scripts/evaluate.py
 ```
 
-Runs the real Golden Dataset (`data/evaluation/`) against the real retriever
-and RAG orchestrator, writes `reports/evaluation_latest.{json,md}`, and exits
-non-zero if the quality gate (`Settings.evaluation_min_*`) is violated. See
-[`docs/evaluation/`](docs/evaluation/) for methodology and the real,
-current results — including the one honestly-failing check.
+Roda o Golden Dataset real (`data/evaluation/`) contra o retriever e o
+orquestrador RAG reais, grava `reports/evaluation_latest.{json,md}`, e
+retorna código de saída diferente de zero se o gate de qualidade
+(`Settings.evaluation_min_*`) for violado. Veja
+[`docs/evaluation/`](docs/evaluation/) para a metodologia e os resultados
+reais e atuais — incluindo a verificação que falha honestamente.
 
 ## Deployment
 
-`infra/` holds real, structurally-correct Terraform (AWS: VPC, RDS/pgvector,
-ECS Fargate, ALB) for `staging`/`production` — written and reviewable, never
-applied (no cloud account backs this project; see
+`infra/` contém Terraform real e estruturalmente correto (AWS: VPC,
+RDS/pgvector, ECS Fargate, ALB) para `staging`/`production` — escrito e
+revisável, mas nunca aplicado (não há conta cloud por trás deste projeto;
+veja
 [`docs/adr/ADR-013-production-deployment-and-release-engineering.md`](docs/adr/ADR-013-production-deployment-and-release-engineering.md)
-and [`infra/README.md`](infra/README.md) for exactly what that does and
-doesn't mean).
+e [`infra/README.md`](infra/README.md) para entender exatamente o que
+isso significa e o que não significa).
 
-## Architecture decisions
+## Decisões de arquitetura
 
-See [`docs/adr/`](docs/adr/) for the 15 Architecture Decision Records
-governing this project — source governance, database choice, layered
-architecture, framework choice, security hardening, evaluation,
-observability, CI/CD, deployment, and documentation governance.
+Veja [`docs/adr/`](docs/adr/) para os 15 Architecture Decision Records que
+regem este projeto — governança de fontes, escolha de banco de dados,
+arquitetura em camadas, escolha de framework, hardening de segurança,
+avaliação, observabilidade, CI/CD, deployment e governança de
+documentação.
