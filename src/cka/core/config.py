@@ -3,7 +3,13 @@ from functools import lru_cache
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-_DEV_ONLY_JWT_SECRET = "dev-only-insecure-secret-change-me"
+# Static scanners (Bandit B105, and TrustOps' own semgrep rule) flag this as
+# a hardcoded secret — they can't see _forbid_dev_jwt_secret_in_production
+# below, which refuses to boot with this value when environment=="production".
+# Real deployments inject the actual secret via SSM SecureString (see
+# infra/modules/application/main.tf, aws_ssm_parameter.jwt_secret_key) —
+# this literal never reaches a running production instance.
+_DEV_ONLY_JWT_SECRET = "dev-only-insecure-secret-change-me"  # nosec B105
 _MIN_JWT_SECRET_BYTES = 32  # matches PyJWT's own recommendation for HS256
 
 
