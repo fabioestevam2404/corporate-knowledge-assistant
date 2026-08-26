@@ -6,8 +6,9 @@ across Blocks 1–4, cross-referenced to `PROGRESS.md` (the full command-by-
 command log) rather than duplicating it. Every ✅/⚠️/❌ below reflects a
 real, executed check — not a conceptual mark.
 
-**App version**: `1.0.0` · **Git commit**: `0f63cb82d4f9f03a1c78229563fd2cf8b8314110`
-(tagged) · **Manifest**: `docs/release-gate/ai-release-manifest.json`
+**App version**: `1.0.0` · **Tagged commit**: `0f63cb82d4f9f03a1c78229563fd2cf8b8314110`
+· **Latest commit (post-tag addendum fixes)**: `bbb1de7cae50317d5abc6542b608cb4677fbd23b`
+· **Manifest**: `docs/release-gate/ai-release-manifest.json`
 
 ---
 
