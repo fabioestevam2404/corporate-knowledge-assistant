@@ -1,7 +1,7 @@
 # RAG Evaluation Report
 
-Generated: 2026-08-25T19:42:44.291088+00:00
-Real LLM used: False
+Generated: 2026-08-26T00:11:32.914111+00:00
+Real LLM used: True
 
 ## Retrieval
 
@@ -18,11 +18,11 @@ Real LLM used: False
 | Metric | Value |
 |---|---|
 | Cases | 6 |
-| Citation Accuracy | 0.000 |
-| Citation Completeness | 0.500 |
-| Abstention Accuracy | 0.500 |
-| Faithfulness | None (n=0) |
-| Answer Relevance | None (n=0) |
+| Citation Accuracy | 0.833 |
+| Citation Completeness | 0.833 |
+| Abstention Accuracy | 0.833 |
+| Faithfulness | 1.0 (n=2) |
+| Answer Relevance | 1.0 (n=2) |
 
 ## Adversarial
 

@@ -7,7 +7,31 @@ command log) rather than duplicating it. Every ✅/⚠️/❌ below reflects a
 real, executed check — not a conceptual mark.
 
 **App version**: `1.0.0` · **Git commit**: `0f63cb82d4f9f03a1c78229563fd2cf8b8314110`
-· **Manifest**: `docs/release-gate/ai-release-manifest.json`
+(tagged) · **Manifest**: `docs/release-gate/ai-release-manifest.json`
+
+---
+
+## ⚠️ Post-tag addendum — read this first
+
+After `v1.0.0`/`v1.0.0-rc.1` were tagged, a real `ANTHROPIC_API_KEY` was
+configured for the first time in this project's history, and the
+evaluation gate was re-run for real. This immediately surfaced **four real
+defects** no prior test run could have caught (the code paths involved had
+never executed against a real model), all now fixed except one genuine,
+understood, still-open limitation:
+
+- ✅ Fixed: `docker-compose.yml` never passed `ANTHROPIC_API_KEY` through to the container.
+- ✅ Fixed: the LLM judge was scored against a placeholder string, not real evidence (`faithfulness` was a false `0.0`).
+- ✅ Fixed: the prompt-injection resistance check flagged a *correct refusal* as a leak, in two places — including a real-model security test that had **never actually run before** in this project (always key-gated, always skipped).
+- ✅ Fixed: `citation_accuracy` penalized correct abstention as a citation failure.
+- ⚠️ **Still open, honestly**: the real evaluation gate now **fails** — `citation_accuracy 0.833 < 0.9` — because one golden-dataset case's correct top-ranked document scores a genuinely low absolute confidence from the cross-encoder reranker. Deliberately not resolved by loosening the qualifying-evidence threshold, which would weaken real hallucination-prevention elsewhere. See `docs/release-gate/PROGRESS.md` ("Post-release: a real ANTHROPIC_API_KEY was configured") for the full investigation, real numbers, and reasoning.
+
+**The tags are not moved** (tags shouldn't be) — this addendum, dated
+after them, is the honest record of what was learned next. Gate 2 below
+reflects the real, current, post-fix numbers; the pre-key numbers (which
+were misleadingly "passing" only because no real generation had ever been
+evaluated) are preserved in git history and in `PROGRESS.md`'s Block 3/
+pre-addendum sections, not deleted.
 
 ---
 
@@ -18,15 +42,17 @@ real, executed check — not a conceptual mark.
 | Lint (`ruff check .`) | ✅ All checks passed |
 | Formatting (`ruff format --check .`) | ✅ All files formatted |
 | Type checking (`mypy src tests scripts`) | ✅ No issues, 160 source files |
-| Unit tests | ✅ pass (part of the 231 below) |
+| Unit tests | ✅ pass (part of the 239 below) |
 | Integration tests | ✅ pass, real Postgres/pgvector |
 | E2E tests | ⚠️ no dedicated `tests/e2e/` — real end-to-end behavior is covered by `scripts/smoke_test.sh` (run for real, Block 4) against the live stack instead of a separate automated E2E suite |
-| Coverage threshold | ✅ 95% (1465 statements, 69 missed), above the 80% CI gate |
+| Coverage threshold | ✅ 97% (up from 95% pre-key), above the 80% CI gate |
 | Database migrations | ✅ `alembic upgrade head`, real `\d documents`/`\d users`/`\d document_chunks` verified |
 
-Real: `231 passed, 4 skipped, 95% coverage` — Sprint 15 final re-run (see
-`PROGRESS.md`). The 4 skips are Anthropic-key-dependent tests, consistently
-skipped since no environment in this project has ever had a real key.
+Real: `239 passed, 0 skipped, 97% coverage` — re-run post-addendum with a
+real `ANTHROPIC_API_KEY` configured (see the addendum above). Every
+previously key-gated test now runs and passes for real, including a
+real-model security test that had never executed before this point in the
+project's history.
 
 ## Gate 2 — RAG Quality
 
@@ -36,16 +62,15 @@ skipped since no environment in this project has ever had a real key.
 | Precision@5 | (informational) | 0.2 |
 | MRR | (informational) | 1.0 |
 | NDCG@5 | (informational) | 1.0 |
-| Faithfulness | ≥ 0.85 | ⚠️ not checked — `real_llm_used: false` |
-| Answer Relevance | ≥ 0.80 | ⚠️ not checked — `real_llm_used: false` |
-| Citation Accuracy | ≥ 0.90 | ⚠️ not checked — `real_llm_used: false` |
-| Abstention | within expected | ✅ 0.5 (generation), 1.0 (adversarial) |
+| Faithfulness | ≥ 0.85 | ✅ 1.0 (real LLM-as-judge, `judged_case_count: 2`) |
+| Answer Relevance | ≥ 0.80 | ✅ 1.0 (real LLM-as-judge, `judged_case_count: 2`) |
+| Citation Accuracy | ≥ 0.90 | ❌ 0.833 — real, understood, still-open failure, see addendum above |
+| Abstention | within expected | ✅ 0.833 (generation), 1.0 (adversarial) |
 
-**Values are real** (`reports/evaluation_latest.json`, regenerated Sprint
-15, `2026-08-25T19:42:44Z`), not estimated — see `docs/evaluation/results.md`
-for the honest read on what a perfect 1.0 does and doesn't demonstrate at
-this corpus size, and why the three LLM-judged metrics are correctly
-un-enforced rather than silently passed.
+**Values are real** (`reports/evaluation_latest.json`, `2026-08-26T00:11:32Z`,
+the first real run against a real `ANTHROPIC_API_KEY`), not estimated —
+see `docs/evaluation/results.md` for the full honest read, including why
+`citation_accuracy` genuinely fails and why that wasn't papered over.
 
 ## Gate 3 — Groundedness
 
@@ -237,18 +262,31 @@ CHANGELOG                 ✅ CHANGELOG.md, generated from real git log
 
 ---
 
-## The one real, significant defect found during this final sprint
+## The real defects found during Sprint 15 and the post-tag addendum
 
-Running the real final test-suite re-run this sprint required is what
-surfaced a genuine, high-severity issue: the local test suite was silently
+**During Sprint 15 itself**: the real final test-suite re-run surfaced a
+genuine, high-severity issue — the local test suite was silently
 destroying real dev/demo data (documents, users) because it shared a
 database with manual/demo use. Found, root-caused, fixed (dedicated
 `cka_test` database, automatic redirect in `tests/conftest.py`), and
 verified by re-running the full suite and confirming real data survived
 intact. Full incident, including an honestly-unresolved anomaly around
 data partially reappearing after a host restart, is documented in
-`PROGRESS.md`, Sprint 15 — not glossed over because it happened at the
-very end of the exercise.
+`PROGRESS.md`, Sprint 15.
+
+**Post-tag** (see the addendum at the top of this document): configuring
+a real `ANTHROPIC_API_KEY` for the first time surfaced four more real
+defects — a missing `docker-compose.yml` passthrough, a placeholder passed
+to the LLM judge instead of real evidence, a prompt-injection false
+positive in two places (one of them a test that had never actually run
+before), and a citation-accuracy metric that penalized correct abstention.
+Three are fixed and verified; the fourth (the reranker's absolute
+confidence calibration on one real case) is a genuine, understood,
+currently-open limitation, not silently resolved.
+
+None of this was glossed over for happening at the very end of the
+exercise, or after the tag was already cut — that's the actual point of
+this entire exercise.
 
 ## Known gaps carried into v1.0.0 (stated, not hidden)
 
@@ -256,9 +294,9 @@ very end of the exercise.
 2. No real cloud deployment — Terraform scaffolding written, never applied.
 3. No locally-generated SBOM — Syft runs correctly in CI; 3 local attempts on this machine did not reliably complete.
 4. No persistent `GET /audit` endpoint.
-5. Generation-quality evaluation metrics (citation accuracy, faithfulness, answer relevance) never validated against a real Anthropic key.
+5. **`citation_accuracy` gate genuinely fails** (0.833 < 0.90) — one real golden-dataset case's correctly-top-ranked document scores low absolute reranker confidence; not resolved by loosening the threshold, since that would weaken real hallucination-prevention elsewhere. See the post-tag addendum above.
 6. No load/throughput testing — performance baseline is sequential, not concurrent.
-7. No real FinOps cost data — no real LLM spend has occurred in this project.
+7. No real FinOps cost data — real generation now works, but token-level cost was not separately measured/reported this pass.
 8. Rollback demonstration deferred — not faked.
 9. Real container CVE scanning (Trivy) is CI-only, not locally verified.
 

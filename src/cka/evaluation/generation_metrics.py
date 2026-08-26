@@ -1,7 +1,15 @@
 def citation_accuracy(cited_source_ids: list[str], expected_source_ids: list[str]) -> float:
-    """Of the sources the answer actually cited, what fraction were correct?"""
+    """Of the sources the answer actually cited, what fraction were correct?
+
+    A real defect (see docs/release-gate/PROGRESS.md, Block 4/Sprint 15):
+    this used to return 0.0 whenever nothing was cited, including a
+    correctly-abstained case where nothing was expected either -- silently
+    penalizing correct abstention as if it were a citation failure, and
+    inconsistent with citation_completeness's own handling of the same
+    empty-expectations case just below.
+    """
     if not cited_source_ids:
-        return 0.0
+        return 1.0 if not expected_source_ids else 0.0
     correct = sum(1 for source_id in cited_source_ids if source_id in expected_source_ids)
     return correct / len(cited_source_ids)
 

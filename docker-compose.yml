@@ -64,6 +64,12 @@ services:
       LOG_LEVEL: INFO
       OTEL_TRACES_ENABLED: "true"
       OTLP_ENDPOINT: jaeger:4317
+      # Passed through from the host's real .env (docker compose itself
+      # reads project-root .env for variable substitution — separate from,
+      # and not blocked by, .dockerignore, which only affects what COPY
+      # bakes into the image). Empty here just means no real key is set;
+      # the app falls back to FakeLLMProvider, same as always.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports:
       - "8010:8000"
     depends_on:

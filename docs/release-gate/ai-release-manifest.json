@@ -12,9 +12,9 @@
   },
   "evaluation": {
     "source": "reports/evaluation_latest.json",
-    "generated_at": "2026-08-25T19:42:44.291088+00:00",
+    "generated_at": "2026-08-26T00:11:32.914111+00:00",
     "dataset": "golden-v1-block3",
-    "real_llm_used": false,
+    "real_llm_used": true,
     "retrieval": {
       "recall_at_5": 1.0,
       "precision_at_5": 0.2,
@@ -23,13 +23,13 @@
       "case_count": 8
     },
     "generation": {
-      "citation_accuracy": 0.0,
-      "citation_completeness": 0.5,
-      "abstention_accuracy": 0.5,
+      "citation_accuracy": 0.8333333333333334,
+      "citation_completeness": 0.8333333333333334,
+      "abstention_accuracy": 0.8333333333333334,
       "case_count": 6,
-      "faithfulness": null,
-      "answer_relevance": null,
-      "judged_case_count": 0
+      "faithfulness": 1.0,
+      "answer_relevance": 1.0,
+      "judged_case_count": 2
     },
     "adversarial": {
       "resistance_rate": 1.0,
@@ -37,8 +37,9 @@
       "case_count": 4,
       "failures": []
     },
-    "gate_result": "passed",
-    "known_gap": "never run against a real ANTHROPIC_API_KEY -- generation-quality metrics (citation_accuracy/faithfulness/answer_relevance) are real-code-path-tested but not real-model-validated"
+    "gate_result": "failed",
+    "gate_failure_reason": "citation_accuracy 0.8333... < 0.9 -- one golden-dataset case (password-policy query) correctly retrieves the right document as top-1 but the cross-encoder reranker's absolute confidence for that pairing is genuinely low (0.0074 vs 0.99+ for passing cases), so the system abstains rather than answers. Not fixed by lowering the qualifying-evidence threshold, which would also admit genuinely irrelevant low-scored results -- see docs/release-gate/PROGRESS.md.",
+    "note": "First real run against a real ANTHROPIC_API_KEY, configured post-v1.0.0 tag. Surfaced and fixed 3 real evaluation-harness defects (judge evidence placeholder, prompt-injection false-positive substring check in two places, citation_accuracy not handling correct abstention) -- see PROGRESS.md."
   },
   "performance_baseline": {
     "measured_at": "2026-08-25",
@@ -48,7 +49,7 @@
     "note": "ask_ms reflects the FakeLLMProvider fallback path (no ANTHROPIC_API_KEY configured in this environment), not a real generation call -- see model.generation_llm and evaluation.known_gap. retrieve_ms p99/max is a single real outlier (7585ms against a 175-334ms baseline), not re-run to smooth it out -- see docs/release-gate/PROGRESS.md, Sprint 15, for the honest read on why."
   },
   "test_suite": {
-    "unit_integration_security_observability": { "passed": 231, "skipped": 4, "coverage_pct": 95 },
+    "unit_integration_security_observability": { "passed": 239, "skipped": 0, "coverage_pct": 97 },
     "lint": "ruff check . -- all checks passed",
     "format": "ruff format --check . -- all files formatted",
     "type_check": "mypy src tests scripts -- no issues found"
@@ -69,6 +70,6 @@
     "No cloud deployment (Terraform scaffolding written, never applied -- ADR-013)",
     "No local SBOM generation (Syft runs correctly in CI; 3 local attempts on this machine did not reliably complete -- ADR-012)",
     "No GET /audit endpoint (structured log events only -- ADR-009/ADR-012)",
-    "Generation-quality evaluation metrics never validated against a real Anthropic key"
+    "citation_accuracy gate genuinely fails on one real golden-dataset case due to low reranker confidence on a correctly-top-ranked-but-unusually-phrased match -- a real, understood, currently-open limitation, not silently tuned away (see evaluation.gate_failure_reason)"
   ]
 }
