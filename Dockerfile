@@ -3,7 +3,7 @@
 # intentionally used through Block 2/3 (see ADR-012) — this is where the
 # spec slates the upgrade.
 
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim-bookworm AS builder
 
 WORKDIR /app
 
@@ -22,13 +22,14 @@ COPY data ./data
 RUN uv sync --frozen --no-dev
 
 
-FROM python:3.12-slim AS runtime
-
+FROM python:3.12-slim-bookworm AS runtime
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PATH="/app/.venv/bin:$PATH"
+
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system app && useradd --system --gid app --home-dir /app app
 
