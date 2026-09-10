@@ -46,6 +46,13 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Cache HuggingFace models (embedding + reranker)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          # Bump this key if DEFAULT_MODEL_NAME changes in either service.
+          key: hf-models-all-MiniLM-L6-v2-ms-marco-MiniLM-L-6-v2-v1
+
       - name: Ruff (lint)
         run: uv run ruff check .
 

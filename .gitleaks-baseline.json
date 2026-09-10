@@ -1,26 +1,7 @@
 [
  {
-  "Description": "",
-  "StartLine": 8,
-  "EndLine": 8,
-  "StartColumn": 14,
-  "EndColumn": 236,
-  "Match": "curl 'http://127.0.0.1:9090/api/v1/query?query=llm_requests_total'\\n{\\\"provider\\\":\\\"FakeLLMProvider\\\"} =\\u003e 1\\n```\\n\\n### Real Grafana dashboard (provisioned via file, not clicked together)\\n\\n```\\n$ curl -u admin:admin ",
-  "Secret": "admin:admin",
-  "File": ".gitleaks-baseline.json",
-  "SymlinkFile": "",
-  "Commit": "18f769c8830418903d5068062b890a6d14b0eb1e",
-  "Entropy": 2.5503407,
-  "Author": "FabioEstevam",
-  "Email": "festevam30@gmail.com",
-  "Date": "2026-08-25T19:07:01Z",
-  "Message": "Block 4 (Sprints 12-14): CI/CD, deployment IaC, and documentation\n\nCI/CD: multi-stage non-root Dockerfile, 4 GitHub Actions workflows\n(ci/security/docker/release), pip-audit/semgrep/gitleaks run for real\nlocally before being encoded. Two real production defects found and\nfixed: a PermissionError from /app staying root-owned under the\nnon-root user, and an orphaned hf_xet subprocess going zombie with no\ninit process to reap it (fixed with init: true / tini) -- the latter\nescalated to a stuck WSL2 VM requiring a full Windows restart to\nrecover, documented in full in PROGRESS.md and troubleshooting.md.\n\nDeployment: AWS Terraform scaffolding (networking/database/application\nmodules, staging/production environments) -- written and structurally\nreal, never applied (no cloud account). Real smoke_test.sh, verified\nend-to-end against the live stack. Real (if partial) graceful-shutdown\nfinding: application-level SIGTERM handling confirmed clean via logs;\ndaemon-level exit-event delivery affected by the same host instability\nabove. Local SBOM generation via Syft documented as a real, stated gap\nafter three attempts on this machine -- CI runs it correctly instead.\n\nDocumentation: architecture, API, security, evaluation, operations, and\nsource-registry docs written from the real codebase and real evidence,\nnot paraphrased from the original roadmap. ADR-012/013/014 record the\nreal decisions and defects behind this sprint's work.\n\nCo-Authored-By: Claude Sonnet 5 \u003cnoreply@anthropic.com\u003e",
-  "Tags": [],
   "RuleID": "curl-auth-user",
-  "Fingerprint": "18f769c8830418903d5068062b890a6d14b0eb1e:.gitleaks-baseline.json:curl-auth-user:8"
- },
- {
-  "Description": "",
+  "Description": "Discovered a potential basic authorization token provided in a curl command, which could compromise the curl accessed resource.",
   "StartLine": 521,
   "EndLine": 521,
   "StartColumn": 6,
@@ -30,17 +11,18 @@
   "File": "docs/release-gate/PROGRESS.md",
   "SymlinkFile": "",
   "Commit": "18f769c8830418903d5068062b890a6d14b0eb1e",
+  "Link": "https://github.com/fabioestevam2404/corporate-knowledge-assistant/blob/18f769c8830418903d5068062b890a6d14b0eb1e/docs/release-gate/PROGRESS.md?plain=1#L521",
   "Entropy": 2.5503407,
   "Author": "FabioEstevam",
   "Email": "festevam30@gmail.com",
   "Date": "2026-08-25T19:07:01Z",
   "Message": "Block 4 (Sprints 12-14): CI/CD, deployment IaC, and documentation\n\nCI/CD: multi-stage non-root Dockerfile, 4 GitHub Actions workflows\n(ci/security/docker/release), pip-audit/semgrep/gitleaks run for real\nlocally before being encoded. Two real production defects found and\nfixed: a PermissionError from /app staying root-owned under the\nnon-root user, and an orphaned hf_xet subprocess going zombie with no\ninit process to reap it (fixed with init: true / tini) -- the latter\nescalated to a stuck WSL2 VM requiring a full Windows restart to\nrecover, documented in full in PROGRESS.md and troubleshooting.md.\n\nDeployment: AWS Terraform scaffolding (networking/database/application\nmodules, staging/production environments) -- written and structurally\nreal, never applied (no cloud account). Real smoke_test.sh, verified\nend-to-end against the live stack. Real (if partial) graceful-shutdown\nfinding: application-level SIGTERM handling confirmed clean via logs;\ndaemon-level exit-event delivery affected by the same host instability\nabove. Local SBOM generation via Syft documented as a real, stated gap\nafter three attempts on this machine -- CI runs it correctly instead.\n\nDocumentation: architecture, API, security, evaluation, operations, and\nsource-registry docs written from the real codebase and real evidence,\nnot paraphrased from the original roadmap. ADR-012/013/014 record the\nreal decisions and defects behind this sprint's work.\n\nCo-Authored-By: Claude Sonnet 5 \u003cnoreply@anthropic.com\u003e",
   "Tags": [],
-  "RuleID": "curl-auth-user",
   "Fingerprint": "18f769c8830418903d5068062b890a6d14b0eb1e:docs/release-gate/PROGRESS.md:curl-auth-user:521"
  },
  {
-  "Description": "",
+  "RuleID": "curl-auth-user",
+  "Description": "Discovered a potential basic authorization token provided in a curl command, which could compromise the curl accessed resource.",
   "StartLine": 434,
   "EndLine": 441,
   "StartColumn": 4,
@@ -50,13 +32,13 @@
   "File": "docs/release-gate/PROGRESS.md",
   "SymlinkFile": "",
   "Commit": "46d9829493203f4adf62d6528f145c91f2a6ceb5",
+  "Link": "https://github.com/fabioestevam2404/corporate-knowledge-assistant/blob/46d9829493203f4adf62d6528f145c91f2a6ceb5/docs/release-gate/PROGRESS.md?plain=1#L434-L441",
   "Entropy": 2.5503407,
   "Author": "FabioEstevam",
   "Email": "festevam30@gmail.com",
   "Date": "2026-08-25T11:07:31Z",
   "Message": "Blocks 1-3: Foundation, RAG core, and security/evaluation/observability\n\nReal, tested implementation of the Corporate Knowledge Assistant, built\nincrementally against the technical specification in\n../Corporate_Knowledge_Assistant_COMPLETO.md (a 15-sprint roadmap), with\nevidence captured throughout in docs/release-gate/PROGRESS.md rather than\nmarked done conceptually.\n\nBlock 1 (Sprints 01-04) - Foundation: FastAPI skeleton, Docker+PostgreSQL/\npgvector, structured observability (structlog + request correlation), a\ngoverned Source Registry with document ingestion (SHA-256 integrity,\nAlembic-managed schema).\n\nBlock 2 (Sprints 05-08) - RAG core: chunking + real embeddings\n(sentence-transformers), hybrid retrieval (pgvector + PostgreSQL full-text\nsearch, RRF-fused) with cross-encoder reranking, and a grounded RAG\norchestrator (POST /ask) with citation validation, rule-based confidence,\nand abstention. LLM: Anthropic Claude behind an abstract LLMProvider.\n\nBlock 3 (Sprints 09-11) - Security, evaluation, observability: JWT auth +\nArgon2id password hashing, RBAC + real per-role document ACL (the roadmap's\nflagship EMPLOYEE-vs-MANAGEMENT authorization test is real and passing),\nper-user rate limiting, a RAG evaluation framework with a real Golden\nDataset (scripts/evaluate.py), and real distributed tracing\n(OpenTelemetry -\u003e Jaeger) + metrics (Prometheus -\u003e Grafana).\n\n231 tests passing (unit/integration/security/observability), 95% coverage.\nSquashed into a single commit since incremental snapshots weren't preserved\nacross these three blocks — see docs/release-gate/PROGRESS.md for the real,\nblock-by-block evidence trail (including 5 real defects found and fixed\nalong the way).\n\nCo-Authored-By: Claude Sonnet 5 \u003cnoreply@anthropic.com\u003e",
   "Tags": [],
-  "RuleID": "curl-auth-user",
   "Fingerprint": "46d9829493203f4adf62d6528f145c91f2a6ceb5:docs/release-gate/PROGRESS.md:curl-auth-user:434"
  }
 ]
